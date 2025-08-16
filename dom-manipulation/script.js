@@ -79,7 +79,7 @@ function createAddQuoteForm() {
   //Export button for JSON
   const exportButton = document.createElement('button');
   exportButton.textContent = 'Export Quotes';
-  exportButton.onclick = exportQuotesToJson;
+  exportButton.onclick = exportToJsonFile;
 
   //Import input for JSON
   const fileInput = document.createElement('input');
@@ -87,7 +87,8 @@ function createAddQuoteForm() {
   fileInput.id = 'importFile';
   fileInput.accept = '.json';
   fileInput.onchange = importFromJsonFile;
- // === ADD Category Filter Dropdown ===
+
+ //ADD Category Filter Dropdown
   const categoryFilter = document.createElement('select');
   categoryFilter.id = 'categoryFilter';
   categoryFilter.onchange = filterQuotes;
@@ -167,7 +168,7 @@ function filterQuotes() {
 }
 
 //Function to export quotes as a downloadable JSON file
-function exportQuotesToJson() {
+function exportToJsonFile() {
   const dataStr = JSON.stringify(quotes, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
