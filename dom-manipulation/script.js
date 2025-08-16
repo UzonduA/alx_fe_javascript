@@ -198,6 +198,11 @@ function importFromJsonFile(event) {
     fileReader.readAsText(file);
   }
 }
+
+document.getElementById('addQuoteButton').onclick = addQuote;
+document.getElementById('exportButton').onclick = exportToJsonFile;
+document.getElementById('importFile').onchange = importFromJsonFile;
+document.getElementById('categoryFilter').onchange = filterQuotes;
 newQuoteButton.addEventListener('click', showRandomQuote);
 
 
