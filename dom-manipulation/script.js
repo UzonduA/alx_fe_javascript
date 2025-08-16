@@ -212,14 +212,14 @@ filterQuotes();
 
 
 // Simulate fetching quotes from a server
-function fetchServerQuotes() {
+function fetchQuotesFromServer() {
   // Mock server URL (JSONPlaceholder for demo)
   const serverUrl = 'https://jsonplaceholder.typicode.com/posts';
 
   return fetch(serverUrl)
     .then(response => response.json())
     .then(data => {
-      // Map server data to quote format for simplicity
+      // Map server data to quote format
       return data.slice(0, 5).map(item => ({
         text: item.title,
         category: 'Server'
@@ -232,8 +232,8 @@ function fetchServerQuotes() {
 }
 
 // Sync server quotes with local quotes
-function syncWithServer() {
-  fetchServerQuotes().then(serverQuotes => {
+function syncQuotes() {
+  fetchQuotesFromServer().then(syncQuotes => {
     let newQuotes = 0;
 
     serverQuotes.forEach(serverQuote => {
@@ -250,9 +250,31 @@ function syncWithServer() {
       populateCategories(); // Update category dropdown
       filterQuotes();     // Update displayed quote
       alert(`Synced ${newQuotes} new quote(s) from the server!`);
+    
+  
+
+    const notification = document.createElement('div');
+      notification.textContent = `Synced ${newQuotes} new quote(s) from the server!`;
+      notification.style.background = '#d4edda';
+      notification.style.padding = '10px';
+      notification.style.marginTop = '10px';
+      notification.style.border = '1px solid #c3e6cb';
+      document.body.appendChild(notification);
+
+      // Remove notification after 5 seconds
+      setTimeout(() => document.body.removeChild(notification), 5000);
+
+serverQuotes.forEach(serverQuote => {
+      console.log('Posting quote to server (mock):', serverQuote.text);
+        });
     }
   });
 }
 
-// Run sync every 10 seconds
-setInterval(syncWithServer, 10000);
+// Run sync every 10 seconds (periodic check)
+setInterval(syncQuotes, 10000);
+
+// Initial sync on page load
+syncQuotes();
+
+
