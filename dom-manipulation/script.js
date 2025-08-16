@@ -209,3 +209,50 @@ newQuoteButton.addEventListener('click', showRandomQuote);
 createAddQuoteForm();
 populateCategories();
 filterQuotes();
+
+
+// Simulate fetching quotes from a server
+function fetchServerQuotes() {
+  // Mock server URL (JSONPlaceholder for demo)
+  const serverUrl = 'https://jsonplaceholder.typicode.com/posts';
+
+  return fetch(serverUrl)
+    .then(response => response.json())
+    .then(data => {
+      // Map server data to quote format for simplicity
+      return data.slice(0, 5).map(item => ({
+        text: item.title,
+        category: 'Server'
+      }));
+    })
+    .catch(err => {
+      console.log('Server fetch failed:', err);
+      return [];
+    });
+}
+
+// Sync server quotes with local quotes
+function syncWithServer() {
+  fetchServerQuotes().then(serverQuotes => {
+    let newQuotes = 0;
+
+    serverQuotes.forEach(serverQuote => {
+      // Check if quote already exists locally
+      const exists = quotes.some(q => q.text === serverQuote.text);
+      if (!exists) {
+        quotes.push(serverQuote);
+        newQuotes++;
+      }
+    });
+
+    if (newQuotes > 0) {
+      saveQuotes();       // Update localStorage
+      populateCategories(); // Update category dropdown
+      filterQuotes();     // Update displayed quote
+      alert(`Synced ${newQuotes} new quote(s) from the server!`);
+    }
+  });
+}
+
+// Run sync every 10 seconds
+setInterval(syncWithServer, 10000);
