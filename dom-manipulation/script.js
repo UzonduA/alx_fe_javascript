@@ -1,6 +1,6 @@
 let quotes = [];
 
-if (localStorage.getItem(quotes)){
+if (localStorage.getItem('quotes')){
      quotes = JSON.parse(localStorage.getItem('quotes'));
 } else {
 
@@ -48,7 +48,8 @@ function addQuote() {
         category: newCategory };
     quotes.push(newQuote);
     saveQuotes(); // Save to localStorage when new quote is added part of task 2 implementaion.
-    showRandomQuote();
+    populateCategories();
+    filterQuotes();
 
     quoteTextInput.value = '';
     quoteCategoryInput.value = '';
@@ -67,7 +68,7 @@ function createAddQuoteForm() {
   inputQuote.placeholder = 'Enter a new quote';
 
   const inputCategory = document.createElement('input');
-  inputQuote.type = 'text';
+  inputCategory.type = 'text';
   inputCategory.id = 'newQuoteCategory';
   inputCategory.placeholder = 'Enter quote category';
 
@@ -86,17 +87,83 @@ function createAddQuoteForm() {
   fileInput.id = 'importFile';
   fileInput.accept = '.json';
   fileInput.onchange = importFromJsonFile;
+ // === ADD Category Filter Dropdown ===
+  const categoryFilter = document.createElement('select');
+  categoryFilter.id = 'categoryFilter';
+  categoryFilter.onchange = filterQuotes;
+
+  // Add default 'All Categories' option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = 'all';
+  defaultOption.textContent = 'All Categories';
+  categoryFilter.appendChild(defaultOption);
 
   // Append everything to form
   formDiv.appendChild(inputQuote);
   formDiv.appendChild(inputCategory);
   formDiv.appendChild(addButton);
   formDiv.appendChild(exportButton);  
-  formDiv.appendChild(fileInput);    
+  formDiv.appendChild(fileInput);  
+  formDiv.appendChild(categoryFilter);   
 
 
   // Add form to body
   document.body.appendChild(formDiv);
+}
+
+//FUNCTION to dynamically populate categories in dropdown ===
+function populateCategories() {
+  const categoryFilter = document.getElementById('categoryFilter');
+
+  // Clear all existing options
+  categoryFilter.innerHTML = '';
+
+  // Add default 'All Categories' option
+  const allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.textContent = 'All Categories';
+  categoryFilter.appendChild(allOption);
+
+  // Extract unique categories from quotes array
+  const uniqueCategories = [...new Set(quotes.map(q => q.category))];
+
+  // Add unique categories as options
+  uniqueCategories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+
+  // Restore last selected category from localStorage
+  const savedCategory = localStorage.getItem('selectedCategory');
+  if (savedCategory && uniqueCategories.includes(savedCategory)) {
+    categoryFilter.value = savedCategory;
+  } else {
+    categoryFilter.value = 'all';
+  }
+}
+
+// ADD THIS FUNCTION to filter quotes and update display ===
+function filterQuotes() {
+  const categoryFilter = document.getElementById('categoryFilter');
+  const selectedCategory = categoryFilter.value;
+
+  // Save selection to localStorage
+  localStorage.setItem('selectedCategory', selectedCategory);
+
+  // Filter quotes based on selected category
+  let filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(q => q.category === selectedCategory);
+
+  if (filteredQuotes.length === 0) {
+    quoteDisplay.innerHTML = 'No quotes found for this category.';
+    return;
+  }
+
+  // Show a random quote from filtered results
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const quote = filteredQuotes[randomIndex];
+  quoteDisplay.innerHTML = `"${quote.text}" — <em>${quote.category}</em>`;
 }
 
 //Function to export quotes as a downloadable JSON file
@@ -120,6 +187,8 @@ function importFromJsonFile(event) {
     const importedQuotes = JSON.parse(event.target.result);
     quotes.push(...importedQuotes);  // Add imported quotes
     saveQuotes();                    // Save to localStorage
+    populateCategories();            // Add refresh categories after import
+    filterQuotes();                  // Add update display after import
     alert('Quotes imported successfully!');
   };
 
@@ -132,3 +201,5 @@ newQuoteButton.addEventListener('click', showRandomQuote);
 
 
 createAddQuoteForm();
+populateCategories();
+filterQuotes();
