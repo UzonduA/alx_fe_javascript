@@ -211,70 +211,60 @@ populateCategories();
 filterQuotes();
 
 
-// Simulate fetching quotes from a server
-function fetchQuotesFromServer() {
-  // Mock server URL (JSONPlaceholder for demo)
+// Fetch quotes from mock server using async/await
+async function fetchQuotesFromServer() { 
   const serverUrl = 'https://jsonplaceholder.typicode.com/posts';
-
-  return fetch(serverUrl)
-    .then(response => response.json())
-    .then(data => {
-      // Map server data to quote format
-      return data.slice(0, 5).map(item => ({
-        text: item.title,
-        category: 'Server'
-      }));
-    })
-    .catch(err => {
-      console.log('Server fetch failed:', err);
-      return [];
-    });
+  try {
+    const response = await fetch(serverUrl);
+    const data = await response.json();
+    // Map server data to quote format
+    return data.slice(0, 5).map(item => ({
+      text: item.title,
+      category: 'Server'
+    }));
+  } catch (err) {
+    console.log('Server fetch failed:', err);
+    return [];
+  }
 }
 
 // Sync server quotes with local quotes
-function syncQuotes() {
-  fetchQuotesFromServer().then(syncQuotes => {
-    let newQuotes = 0;
+async function syncQuotes() { 
+  const serverQuotes = await fetchQuotesFromServer();
+  let newQuotes = 0;
 
-    serverQuotes.forEach(serverQuote => {
-      // Check if quote already exists locally
-      const exists = quotes.some(q => q.text === serverQuote.text);
-      if (!exists) {
-        quotes.push(serverQuote);
-        newQuotes++;
-      }
-    });
+  // Merge server quotes with local quotes (server takes precedence)
+  serverQuotes.forEach(serverQuote => {
+    const exists = quotes.some(q => q.text === serverQuote.text);
+    if (!exists) {
+      quotes.push(serverQuote);
+      newQuotes++;
 
-    if (newQuotes > 0) {
-      saveQuotes();       // Update localStorage
-      populateCategories(); // Update category dropdown
-      filterQuotes();     // Update displayed quote
-      alert(`Synced ${newQuotes} new quote(s) from the server!`);
-    
-  
-
-    const notification = document.createElement('div');
-      notification.textContent = `Synced ${newQuotes} new quote(s) from the server!`;
-      notification.style.background = '#d4edda';
-      notification.style.padding = '10px';
-      notification.style.marginTop = '10px';
-      notification.style.border = '1px solid #c3e6cb';
-      document.body.appendChild(notification);
-
-      // Remove notification after 5 seconds
-      setTimeout(() => document.body.removeChild(notification), 5000);
-
-serverQuotes.forEach(serverQuote => {
+      // Simulate posting quote to server
       console.log('Posting quote to server (mock):', serverQuote.text);
-        });
     }
   });
+
+  if (newQuotes > 0) {
+    saveQuotes();       // Update localStorage
+    populateCategories(); // Update category dropdown
+    filterQuotes();     // Update displayed quote
+
+    // Notification UI
+    const notification = document.createElement('div');
+    notification.textContent = `Synced ${newQuotes} new quote(s) from the server!`;
+    notification.style.background = '#d4edda';
+    notification.style.padding = '10px';
+    notification.style.marginTop = '10px';
+    notification.style.border = '1px solid #c3e6cb';
+    document.body.appendChild(notification);
+
+    setTimeout(() => document.body.removeChild(notification), 5000);
+  }
 }
 
-// Run sync every 10 seconds (periodic check)
+// Periodically check for new quotes every 10 seconds
 setInterval(syncQuotes, 10000);
 
 // Initial sync on page load
 syncQuotes();
-
-
