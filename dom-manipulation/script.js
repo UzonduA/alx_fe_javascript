@@ -13,24 +13,48 @@ const newQuoteButton = document.getElementById('newQuote');
 // Function to show a random quote
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
-  const selectedQuote = quotes[randomIndex];
+  const quote = quotes[randomIndex];
 
   // Display quote with its category
-  quoteDisplay.textContent = `"${selectedQuote.text}" — [${selectedQuote.category}]`;
+  quoteDisplay.innerHTML = `"${quote.text}" —  <em>${quote.category}</em>`;
 }
 
-// Function to create the Add Quote form
+
+// Function to add a new quote to the array
+function addQuote() {
+    const quoteTextInput = document.getElementById('newQuoteText');
+    const quoteCategoryInput = document.getElementById('newQuoteCategory');
+
+    const newText = quoteTextInput.value.trim();
+    const newCategory = quoteCategoryInput.value.trim();
+
+  if (newText !== '' && newCategory !== '') {
+    const newQuote = { 
+        text: newText,
+        category: newCategory };
+    quotes.push(newQuote);
+
+    showRandomQuote();
+
+    quoteTextInput.value = '';
+    quoteCategoryInput.value = '';
+  } else {
+    alert('Please fill in both the quote and the category.');
+  }
+}
+
+ //Create form dynamically with proper IDs
 function createAddQuoteForm() {
   const formDiv = document.createElement('div');
 
-  const inputText = document.createElement('input');
-  inputText.id = 'newQuoteText';
-  inputText.type = 'text';
-  inputText.placeholder = 'Enter a new quote';
+  const inputQuote = document.createElement('input');
+  inputQuote.type = 'text';
+  inputQuote.id = 'newQuoteText';
+  inputQuote.placeholder = 'Enter a new quote';
 
   const inputCategory = document.createElement('input');
+  inputQuote.type = 'text';
   inputCategory.id = 'newQuoteCategory';
-  inputCategory.type = 'text';
   inputCategory.placeholder = 'Enter quote category';
 
   const addButton = document.createElement('button');
@@ -38,33 +62,13 @@ function createAddQuoteForm() {
   addButton.onclick = addQuote;
 
   // Add inputs and button to form
-  formDiv.appendChild(inputText);
+  formDiv.appendChild(inputQuote);
   formDiv.appendChild(inputCategory);
   formDiv.appendChild(addButton);
 
   // Add form to body
   document.body.appendChild(formDiv);
 }
-
-// Function to add a new quote to the array
-function addQuote() {
-  const newText = document.getElementById('newQuoteText').value.trim();
-  const newCategory = document.getElementById('newQuoteCategory').value.trim();
-
-  if (newText !== "" && newCategory !== "") {
-    const newQuote = { text: newText, category: newCategory };
-    quotes.push(newQuote);
-    
-    document.getElementById('newQuoteText').value = "";
-    document.getElementById('newQuoteCategory').value = "";
-
-    showRandomQuote();
-  } else {
-    alert("Please fill in both the quote and the category.");
-  }
-}
-
-
 newQuoteButton.addEventListener('click', showRandomQuote);
 
 
