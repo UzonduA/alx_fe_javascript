@@ -234,15 +234,19 @@ async function syncQuotes() {
   let newQuotes = 0;
 
   // Merge server quotes with local quotes (server takes precedence)
-  serverQuotes.forEach(serverQuote => {
+  serverQuotes.forEach(async (serverQuote) => {
     const exists = quotes.some(q => q.text === serverQuote.text);
     if (!exists) {
       quotes.push(serverQuote);
       newQuotes++;
 
-      // Simulate posting quote to server
-      console.log('Posting quote to server (mock):', serverQuote.text);
-    }
+      //Post back to server (mock API)
+      await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(serverQuote)
+    });
+  }
   });
 
   if (newQuotes > 0) {
@@ -267,4 +271,7 @@ async function syncQuotes() {
 setInterval(syncQuotes, 10000);
 
 // Initial sync on page load
+createAddQuoteForm();
+populateCategories();
+filterQuotes();
 syncQuotes();
