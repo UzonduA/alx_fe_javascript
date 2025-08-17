@@ -256,7 +256,7 @@ async function syncQuotes() {
 
     // Notification UI
     const notification = document.createElement('div');
-    notification.textContent = `Synced ${newQuotes} new quote(s) from the server!`;
+    notification.textContent = "Quotes synced with server!";
     notification.style.background = '#d4edda';
     notification.style.padding = '10px';
     notification.style.marginTop = '10px';
@@ -265,13 +265,18 @@ async function syncQuotes() {
 
     setTimeout(() => document.body.removeChild(notification), 5000);
   }
+  for (const quote of quotes) {
+    await fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(quote)
+    });
+  }
+
 }
 
 // Periodically check for new quotes every 10 seconds
 setInterval(syncQuotes, 10000);
 
 // Initial sync on page load
-createAddQuoteForm();
-populateCategories();
-filterQuotes();
 syncQuotes();
